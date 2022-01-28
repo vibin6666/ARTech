@@ -1,0 +1,16 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+      "storageAccountName": {
+        "value": "ascenddatadevperu"
+      },
+      "settingName": {
+        "value": "ascenddatadev"
+      },
+      "workspaceId": {
+        "value": "/subscriptions/50c53f21-6c1e-45f8-ba62-41b23e261bff/resourcegroups/eits-sandbox-ascendcoe-bu-261bff-rg/providers/microsoft.operationalinsights/workspaces/ascendlo
+ganalyticsdev"
+      }
+  }
+}

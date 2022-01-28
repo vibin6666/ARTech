@@ -1,0 +1,12 @@
+- name: Install epel repo
+  yum:
+   name: epel-release
+   state: present
+   update_cache: true
+
+- name: Install the Java 8 package
+  yum:
+   name: java-1.8.0-openjdk
+   state: present
+   update_cache: yes
+

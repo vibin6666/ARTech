@@ -1,0 +1,18 @@
+---
+- hosts: localhost
+  #remote_user: centos
+  become: yes
+  become_user: root
+  name: Update and upgrade apt packages
+  become: true
+  tasks:
+    - name: Python
+      apt:
+        name: python
+        state: latest
+  roles:
+   - { role: java }
+   - { role: elasticsearch }
+   - { role: kibana }
+   - { role: nginx }
+   #- { role: logstash }

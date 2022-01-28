@@ -1,0 +1,412 @@
+creating EC2 instance:
+vim main.tf
+provider "aws" {
+    region = "us-east-2"
+    access_key = "AKIAUONU3CZFZMMF2LXJ"
+    secret_key = "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"
+
+}
+vim var.tf
+resource "aws_instance" "centos" {
+    ami = "ami-01e36b7901e884a10"
+    instance_type = "t2.micro"
+
+    tags = {
+        Name = "centos server by Terraform"
+    }
+
+}
+CREATING GROUP:
+vim main.tf
+provider "aws" {
+    region = "us-east-2"
+    access_key = "AKIAUONU3CZFZMMF2LXJ"
+    secret_key = "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"
+}
+vim var.tf
+resource "aws_iam_group" "developers" {
+  name = "developers"
+  path = "/users/"
+}
+CREATING ROLE:
+vim main.tf
+provider "aws" {
+    region = "us-east-2"
+    access_key = "AKIAUONU3CZFZMMF2LXJ"
+    secret_key = "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"
+}
+vim var.tf	
+resource "aws_iam_role" "test_role" {
+  name = "test_role"
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+
+  tags = {
+    tag-key = "tag-value"
+  }
+}
+CREATING policy:
+vim main.tf
+provider "aws" {
+    region = "us-east-2"
+    access_key = "AKIAUONU3CZFZMMF2LXJ"
+    secret_key = "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"
+}
+vim var.tf
+resource "aws_iam_policy" "policy" {
+  name        = "test_policy"
+  path        = "/"
+  description = "My test policy"
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ec2:Describe*",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
+CREATING SECURITY GROUPS
+vim main.tf
+provider "aws" {
+    region = "us-east-2"
+    access_key = "AKIAUONU3CZFZMMF2LXJ"
+    secret_key = "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"
+}
+vim var.tf
+resource "aws_vpc" "mainvpc" {
+  cidr_block = "10.1.0.0/16"
+}
+
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.mainvpc.id
+
+  ingress {
+    protocol  = -1
+    self      = true
+    from_port = 0
+    to_port   = 0
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+CREATING VPC-id
+touch main.tf
+vim main.tf
+provider "aws" {
+    region = "us-east-2"
+    access_key = "AKIAUONU3CZFZMMF2LXJ"
+    secret_key = "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"
+}
+vim var.tf
+resource "aws_vpc" "main" {
+  cidr_block       = "10.0.0.0/16"
+  instance_tenancy = "default"
+
+  tags = {
+    Name = "main"
+  }
+}
+CREATING PUBLIC SUBNET:
+mkdir public subnet
+touch main.tf
+vim main.tf
+provider "aws" {
+    region = "us-east-2"
+    access_key = "AKIAUONU3CZFZMMF2LXJ"
+    secret_key = "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"
+}
+touch var.tf
+vim var.tf
+resource "aws_vpc" "prod-vpc" {
+    cidr_block = "10.0.0.0/16"
+    enable_dns_support = "true" #gives you an internal domain name
+    enable_dns_hostnames = "true" #gives you an internal host name
+    enable_classiclink = "false"
+    instance_tenancy = "default"
+
+    tags = {
+        Name = "prod-vpc"
+    }
+}
+resource "aws_subnet" "prod-public-1" {
+    vpc_id = "${aws_vpc.prod-vpc.id}"
+    cidr_block = "10.0.1.0/24"
+    map_public_ip_on_launch = "true" //it makes this a public subnet
+
+    tags  = {
+        Name = "prod-public-1"
+    }
+}
+CREATING IGW
+mkdir igw
+touch main.tf
+vim main.tf
+provider "aws" {
+    region = "us-east-2"
+    access_key = "AKIAUONU3CZFZMMF2LXJ"
+    secret_key = "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"
+}
+vim var.tf
+resource "aws_vpc" "prod-vpc" {
+    cidr_block = "10.0.0.0/16"
+    enable_dns_support = "true" #gives you an internal domain name
+    enable_dns_hostnames = "true" #gives you an internal host name
+    enable_classiclink = "false"
+    instance_tenancy = "default"
+
+    tags = {
+        Name = "prod-vpc"
+    }
+}
+resource "aws_subnet" "prod-public-1" {
+    vpc_id = "${aws_vpc.prod-vpc.id}"
+    cidr_block = "10.0.1.0/24"
+    map_public_ip_on_launch = "true" //it makes this a public subnet
+
+    tags  = {
+        Name = "prod-public-1"
+    }
+}
+resource "aws_internet_gateway" "prod-igw" {
+    vpc_id = "${aws_vpc.prod-vpc.id}"
+    tags {
+        Name = "prod-igw"
+    }
+}
+CREATING S3
+S3 BUCKET CREATION
+resource "aws_s3_bucket" "bobb" {
+  bucket = "jaga-az-aws-dev1"
+  acl    = "private"
+
+  tags = {
+    Name        = "My bucket"
+    Environment = "Dev"
+  }
+}
+VERSIONING AND LIFECYCLE_RULE
+resource "aws_s3_bucket" "versioning_bu" {
+  bucket = "jaga-az-aws-dev1"
+  acl    = "private"
+
+  versioning {
+    enabled = true
+  }
+
+  lifecycle_rule {
+    prefix  = "config/"
+    enabled = true
+
+    noncurrent_version_transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+
+    noncurrent_version_transition {
+      days          = 60
+      storage_class = "GLACIER"
+    }
+
+uploading a file to a bucket
+resource "aws_s3_bucket_object" "object" {
+  bucket = "your_bucket_name"
+  key    = "new_object_key"
+  source = "path/to/file"
+
+  # The filemd5() function is available in Terraform 0.11.12 and later
+  # For Terraform 0.11.11 and earlier, use the md5() function and the file() function:
+  # etag = "${md5(file("path/to/file"))}"
+  etag = filemd5("path/to/file")
+}
+CREATING ROUTETABLE
+vim var.tf
+resource "aws_vpc" "main" {
+  cidr_block = "10.1.0.0/16"
+  tags = {
+  Name = "The Cloud Coach Testing VPC"
+  }
+}
+resource "aws_internet_gateway" "main" {
+   vpc_id = "${aws_vpc.main.id}"
+}
+resource "aws_subnet" "main" {
+   vpc_id = "${aws_vpc.main.id}"
+   cidr_block = "10.1.1.0/24"
+   availability_zone = "us-east-2b"
+   }
+resource "aws_route_table" "default" {
+   vpc_id = "${aws_vpc.main.id}"  
+   route {
+   cidr_block = "0.0.0.0/0"
+   gateway_id = "${aws_internet_gateway.main.id}"
+   }
+}
+resource "aws_route_table_association" "main" {
+   subnet_id = "${aws_subnet.main.id}"
+   route_table_id = "${aws_route_table.default.id}"
+   }
+ CREATING KMS KEY
+resource "aws_kms_key" "a" {
+  description             = "KMS key 1"
+  deletion_window_in_days = 10
+}
+CREATING LOAD BALANCER
+resource "aws_iam_user" "lb" {
+  name = "loadbalancer"
+  path = "/system/"
+
+  tags = {
+    tag-key = "tag-value"
+  }
+}
+
+resource "aws_iam_access_key" "lb" {
+  user = aws_iam_user.lb.name
+}
+
+resource "aws_iam_user_policy" "lb_ro" {
+  name = "test"
+  user = aws_iam_user.lb.name
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ec2:Describe*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+#CREATING NAT GATEWAY
+#Virtual Private Cloud
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16" # 65536 ip addresses
+  tags = {
+    Name = "MY VPC"
+      }
+}
+
+# Internet Gateway
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+  tags = {
+    Name = "MY IGW"
+      }
+}
+
+resource "aws_route_table" "igw" {
+  vpc_id = aws_vpc.main.id
+  tags = {
+    Name = "MY RT"
+      }
+}
+
+resource "aws_route" "igw" {
+  route_table_id = aws_route_table.igw.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id = aws_internet_gateway.main.id
+}
+
+# Network Gateway
+resource "aws_route_table" "ngw" {
+  vpc_id = aws_vpc.main.id
+  tags = {
+    Name = "MY NAT"
+      }
+}
+
+resource "aws_route" "ngw" {
+  route_table_id = aws_route_table.ngw.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id = aws_nat_gateway.main.id
+}
+#EIP Assign for NAT Gateway
+resource "aws_eip" "nat" {
+  vpc = true
+}
+
+resource "aws_nat_gateway" "main" {
+  allocation_id = aws_eip.nat.id
+  subnet_id = aws_subnet.public-ap-south-1a.id
+  tags = {
+    Name = "MY EIP"
+      }
+}
+#### public- Subnet 1a
+resource "aws_subnet" "public-ap-south-1a" {
+  vpc_id = aws_vpc.main.id
+  cidr_block = "10.0.100.0/24"
+  availability_zone_id = "use2-az1"
+  tags = {
+    Name = "public-ap-south-1a"
+      }
+}
+
+resource "aws_route_table_association" "public-ap-south-1a" {
+  subnet_id = aws_subnet.public-ap-south-1a.id
+  route_table_id = aws_route_table.igw.id
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

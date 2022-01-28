@@ -1,0 +1,22 @@
+kubectl get nodes
+helm repo add jupyterhub https://jupyterhub.github.io/helm-chart/
+helm repo update
+
+openssl rand -hex 32
+d401ee1134067754f85cf6036cd7029fd3f541287e41c67bd7c104ec42339b07
+touch config.yaml
+
+proxy:
+  secretToken: "d401ee1134067754f85cf6036cd7029fd3f541287e41c67bd7c104ec42339b07"
+  
+
+RELEASE=jupyterhub
+NAMESPACE=jhub
+helm upgrade --cleanup-on-fail \
+  --install $RELEASE jupyterhub/jupyterhub \
+  --namespace $NAMESPACE \
+  --create-namespace \
+  --version=0.10.6 \
+  --values config.yaml
+  
+  

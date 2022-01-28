@@ -1,0 +1,25 @@
+[7:15 am, 04/01/2022] ramanji devops: . docker install
+	1. curl -fsSL https://get.docker.com/ | sh
+	2. systemctl start docker
+	3. systemctl status docker
+[7:15 am, 04/01/2022] ramanji devops: vi ~/.bashrc
+export PATH=$PATH:/usr/local/bin/
+source ~/.bashrc
+[7:15 am, 04/01/2022] ramanji devops: ssh-keygen
+
+
+
+curl -Lo kops https://github.com/kubernetes/kops/releases/download/$(curl -s https://api.github.com/repos/kubernetes/kops/releases/latest | grep tag_name | cut -d '"' -f 4)/kops-linux-amd64
+chmod +x ./kops
+sudo mv ./kops /usr/local/bin
+curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin/kubectl
+[7:15 am, 04/01/2022] ramanji devops: vim /etc/ssh/sshd_config
+[7:15 am, 04/01/2022] ramanji devops: systemctl restart sshd
+[7:15 am, 04/01/2022] ramanji devops: vim /etc/sudoers
+
+
+vi ~/.bashrc
+export PATH=$PATH:/usr/local/bin/
+source ~/.bashrc

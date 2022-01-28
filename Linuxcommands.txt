@@ -1,0 +1,24 @@
+Linux commands
+1.mkdir -> To create the folders
+ex: mkdir test1
+2.ls -> to check list of folders or files
+3. ls -lart -> to check list of folders or files with hidden files also
+4. pwd -> to check current path
+5. cd -> to go inside folder
+6. cd ..  -> one step back from current location
+7. cd ../.. -> Two steps back from current location
+8. cd ../../.. -> Three steps back from current location
+9. rm -rf -> to delete the files or folders
+10. touch -> to create the file
+11. vi (or) vim -> to edit the files
+12. esc :wq! -> to save quit from file
+13. esc :q! -> with out save quit from file
+14. cat -> to view the content inside file.
+15. sudo su -> login as root account
+16. wget -> webget command used to download package from internet
+17. yum -> to install the packages will use yum command
+18. copy -> copy the folder or file with in server.
+19.scp -> copy the file or folder from one server to other server.
+20. ssh -> command used for connect the servers.
+21. chmod -> used to change the user permission
+22. crontab -> used for schedule the jobs.

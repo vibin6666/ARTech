@@ -1,0 +1,399 @@
+---
+- hosts: localhost
+  become: yes
+  tasks:
+
+  - name: Install Packages
+    yum: name={{ item }} update_cache=yes state=latest
+    with_items:
+      - npm
+      - nodejs
+      - maven
+      - java
+      - gcc-c++
+      - telnet
+
+  - name: post to consol 
+    shell: curl -sL https://dl.yarnpkg.com/rpm/yarn.repo -o /etc/yum.repos.d/yarn.repo
+
+  - name: Install Packages
+    yum: name={{ item }} update_cache=yes state=latest
+    with_items:
+      - yarn
+
+
+  - name: Adding the path in the bashrc files
+    lineinfile: dest=/root/.bashrc line='export PATH=$PATH:/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-0.el8_0.x86_64' insertafter='EOF' regexp='export PATH=\$PATH:/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.222.b10-0.el8_0.x86_64' state=present
+
+  - name: Source the bashrc file
+    shell: source /root/.bashrc
+
+  - name: Adding the path in the bashrc files
+    lineinfile: dest=/root/.bashrc line='export PATH=$PATH:/usr/share/maven' insertafter='EOF' regexp='export PATH=\$PATH:/usr/share/maven' state=present
+
+  - name: Source the bashrc file
+    shell: source /root/.bashrc
+
+
+#########################VPC Creation ###########################    
+---
+- hosts: localhost
+  #connection: localhost
+
+  vars:
+      vpc_cidr_block: 10.0.0.0/16
+      cidr_block: 10.0.2.0/24
+      cidr: 10.0.4.0/24
+      cidr_ip: 10.0.6.0/24
+      cidra_pub: 10.0.1.0/24
+      cidrb_pub: 10.0.3.0/24
+      cidrc_pub: 10.0.5.0/24
+
+  tasks:
+   - ec2_vpc_net:
+      name: global-ascend-tableau-vpc
+      state: present
+      cidr_block: "{{ vpc_cidr_block }}"
+      region: us-east-2
+     register: newvpc
+
+   - ec2_vpc_igw:
+      vpc_id: "{{ newvpc.vpc.id }}"
+      state: present
+      region: us-east-2
+     register: publicroute
+
+   - ec2_vpc_subnet:
+      state: present
+      vpc_id: "{{ newvpc.vpc.id }}"
+      region: us-east-2
+      az: us-east-2a
+      cidr: "{{ cidr_block }}"
+      resource_tags:
+       Name: "Privatesubnet-1a"
+     register: privatesubneta
+
+   - ec2_vpc_subnet:
+      state: present
+      vpc_id: "{{ newvpc.vpc.id }}"
+      region: us-east-2
+      az: us-east-2b
+      cidr: "{{ cidr }}"
+      resource_tags:
+       Name: "Privatesubnet-1b"
+     register: privatesubnetb
+
+   - ec2_vpc_subnet:
+      state: present
+      vpc_id: "{{ newvpc.vpc.id }}"
+      region: us-east-2
+      az: us-east-2c
+      cidr: "{{ cidr_ip }}"
+      resource_tags:
+       Name: "Privatesubnet-1c"
+     register: privatesubnetc
+
+   - ec2_vpc_subnet:
+      state: present
+      vpc_id: "{{ newvpc.vpc.id }}"
+      region: us-east-2
+      az: us-east-2a
+      cidr: "{{ cidra_pub }}"
+      resource_tags:
+       Name: "Publicesubnet-1a"
+     register: publicsubneta
+
+   - ec2_vpc_subnet:
+      state: present
+      vpc_id: "{{ newvpc.vpc.id }}"
+      region: us-east-2
+      az: us-east-2b
+      cidr: "{{ cidrb_pub }}"
+      resource_tags:
+       Name: "Publicsubnet-1b"
+     register: publicsubnetb
+
+   - ec2_vpc_subnet:
+      state: present
+      vpc_id: "{{ newvpc.vpc.id }}"
+      region: us-east-2
+      az: us-east-2c
+      cidr: "{{ cidrc_pub }}"
+      resource_tags:
+       Name: "Publicsubnet-1c"
+     register: publicsubnetc
+
+   - ec2_vpc_nat_gateway:
+      state: present
+      region: us-east-2
+      wait: yes
+      if_exist_do_not_create: true
+      subnet_id: "{{ publicsubneta.subnet.id }}"
+     register: privatenat
+
+   - ec2_vpc_nat_gateway:
+      state: present
+      region: us-east-2
+      wait: yes
+      if_exist_do_not_create: true
+      subnet_id: "{{ publicsubnetb.subnet.id }}"
+     register: privatenat
+
+   - ec2_vpc_nat_gateway:
+      state: present
+      region: us-east-2
+      wait: yes
+      if_exist_do_not_create: true
+      subnet_id: "{{ publicsubnetc.subnet.id }}"
+     register: privatenat
+
+
+   - ec2_vpc_route_table:
+      vpc_id: "{{ newvpc.vpc.id }}"
+      region: us-east-2
+      tags:
+       Name: "Public-Routing"
+      subnets:
+       - "{{ publicsubneta.subnet.id }}"
+       - "{{ publicsubnetb.subnet.id }}"
+       - "{{ publicsubnetc.subnet.id }}"
+      routes:
+       - dest: "0.0.0.0/0"
+         gateway_id: "{{ publicroute.gateway_id }}"
+   - ec2_vpc_route_table:
+      vpc_id: "{{ newvpc.vpc.id }}"
+      region: us-east-2
+      tags:
+       Name: "Private-Routing"
+      subnets:
+       - "{{ privatesubneta.subnet.id }}"
+       - "{{ privatesubnetb.subnet.id }}"
+       - "{{ privatesubnetc.subnet.id }}"
+      routes:
+       - dest: "0.0.0.0/0"
+         gateway_id: "{{ privatenat.nat_gateway_id }}"
+   - debug:
+      msg: "{{ privatenat.nat_gateway_id }}"
+   - debug:
+      msg: "{{ publicsubneta.subnet.id }}"
+   - debug:
+      msg: "{{ publicsubnetb.subnet.id }}"
+      
+
+################### EC2 Creation #############################
+---
+- name: Create a new Databricks  EC2 instance
+  hosts: localhost
+  gather_facts: False
+
+  vars:
+      region: us-east-2
+      instance_type: t2.nano
+      ami: ami-0f2b4fc905b0bd1f1  # Centos
+      keypair: ansible_databricks # pem file name
+
+  tasks:
+
+    - name: Create an ec2 instance
+      ec2:
+         key_name: "{{ keypair }}"
+         group: aws-ansible  # security group name
+         instance_type: "{{ instance_type}}"
+         image: "{{ ami }}"
+         wait: true
+         region: "{{ region }}"
+         aws_zone: us-east-2a
+         count: 1  # default
+         count_tag:
+            Name: Tableau Server primary
+         instance_tags:
+            Name: Tableau Server primary
+         count_tag:
+            Name: Tableau Server worker1
+         instance_tags:
+            Name: Tableau Server worker1
+         count_tag:
+            Name: Tableau Server worker1
+         instance_tags:
+            Name: Tableau Server worker2
+
+         vpc_subnet_id: subnet-eec7b786
+         assign_public_ip: yes
+      register: ec2
+    - name: Launch the new t2 micro EC2 Instance
+      ec2:
+         key_name: "{{ keypair }}"
+         group: aws-ansible  # security group name
+         instance_type: "{{ instance_type}}"
+         image: "{{ ami }}"
+         wait: true
+         region: "{{ region }}"
+         aws_zone: us-east-2b
+         vpc_subnet_id: subnet-ca359cb0
+         assign_public_ip: yes
+      register: ec2
+
+    - name: Launch the new t2 micro EC2 Instance
+      ec2:
+         key_name: "{{ keypair }}"
+         group: aws-ansible  # security group name
+         instance_type: "{{ instance_type}}"
+         image: "{{ ami }}"
+         wait: true
+         region: "{{ region }}"
+         aws_zone: us-east-2c
+         vpc_subnet_id: subnet-7a534f37
+         assign_public_ip: yes
+      register: ec2
+################ Rabbitmq#########################
+---
+- hosts: localhost
+  become: yes
+  tasks:
+
+  - name: upgrade all packages
+    yum: name=* state=latest
+
+  - name: Install Packages
+    yum: name={{ item }} update_cache=yes state=latest
+    with_items:
+      - epel-release
+      - wget
+
+  - name: Install Rebbitmq
+    shell: yes |  yum install rabbitmq-server
+
+  - name: start rabbitmq
+    shell: |
+          systemctl start rabbitmq-server
+          systemctl enable rabbitmq-server
+
+
+- hosts: rabbit
+  tasks:
+
+  - name: Copy a file to remote server
+    copy:
+      src: /var/lib/rabbitmq/.erlang.cookie
+      dest: /home/centos
+###################### Reddis #########################
+
+---
+- hosts: localhost
+  become: yes
+  tasks:
+
+  - name: upgrade all packages
+    yum: name=* state=latest
+
+  - name: Install Packages
+    yum: name={{ item }} update_cache=yes state=latest
+    with_items:
+      - epel-release
+      - wget
+
+  - name: Install Redis
+    shell: yes | yum install redis
+  - name: Run expect to wait for a successful PXE boot via out-of-band CIMC
+    shell: |
+          systemctl start redis
+          sysctl vm.overcommit_memory=1
+          sed -i 's/protected-mode yes/protected-mode no/g' /etc/redis.conf
+
+################ Anaconda packages ############################
+---
+- hosts: localhost
+  become: yes
+  become_user: root
+  tasks:
+
+  - name: Install Conda
+    block:
+    - name: Download Anaconda
+      get_url:
+        url: https://repo.anaconda.com/archive/Anaconda3-2019.07-Linux-x86_64.sh
+        dest: /home/centos
+
+############## Conda #####################
+---
+- hosts: localhost
+  become: yes
+  become_user: root
+  tasks:
+
+  - name: Run command pip
+    shell: yes | conda create --name python3test python=3
+    
+  - name: install notebook
+    shell: conda install notebook
+  
+  - name: Install conda kernels
+    shell: conda install -y nb_conda_kernels
+
+  - name: Run command pip
+    shell: yes | conda create --name python3test python=3
+################## Kubernetes ##############################
+
+---
+- hosts: localhost
+  become: yes
+  tasks:
+
+  - name: upgrade all packages
+    yum: name=* state=latest
+
+  - name: Install Packages
+    yum: name={{ item }} update_cache=yes state=latest
+    with_items:
+      - epel-release
+      - wget
+  - name: install yum repo for kubernetes
+    blockinfile:
+      path: /etc/yum.repos.d/kubernetes.repo
+      create: yes
+      block: |
+         [kubernetes]
+         name=Kubernetes
+         baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+         enabled=1
+         gpgcheck=1
+         repo_gpgcheck=1
+         gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
+  - name: Install kubelet
+    shell: yum -y install docker kubeadm kubelet kubectl --disableexcludes=kubernetes
+
+  - name: enable kubelet
+    shell: systemctl enable --now kubelet
+
+  - name: enable docker
+    shell: systemctl enable --now docker
+
+  - name: start docker
+    shell: service docker start
+
+  - name: start kubelet
+    shell: service kubelet start
+
+
+  - name: install yum repo for kubernetes
+    blockinfile:
+       path: /etc/sysctl.d/k8s.conf
+       create: yes
+       block: |
+         net.bridge.bridge-nf-call-ip6tables = 1
+         net.bridge.bridge-nf-call-iptables = 1
+
+  - name: running commands
+    shell: |
+      sysctl net.bridge.bridge-nf-call-iptables=1
+      sysctl net.ipv4.ip_forward=1
+      sysctl --system
+      echo "1" > /proc/sys/net/ipv4/ip_forward
+      systemctl daemon-reload
+      systemctl restart kubele
+      
+ ###################Jenkins install #########################################
+ 
+
+      

@@ -1,0 +1,6 @@
+package
+
+http://13.58.120.183:8081/repository/package/
+
+snapshot
+http://13.58.120.183:8081/repository/snapshot/

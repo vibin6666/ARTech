@@ -1,0 +1,13 @@
+FROM amazonlinux:2017.03   
+
+Maintainer:ramanji.devops@gmail.com
+
+RUN yum update -y && yum install -y awslogs && yum clean all
+
+COPY awslogs.conf /etc/awslogs/awslogs.conf
+
+RUN yum -y install java-1.8.0-openjdk java-1.8.0-openjdk-devel
+
+WORKDIR /
+
+COPY *.jar /root@BLRCSLJENV02:/var/lib/jenkins/workspace/RAMANJI/Docker

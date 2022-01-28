@@ -1,0 +1,16 @@
+[7:18 am, 29/12/2021] Vibin: Ramanji to Everyone
+docker tag imagename username/imagename
+
+7:17 AMRamanji to Everyone
+docker push username/imagename
+
+7:17 AMsireesha to Everyone
+image-nothing but set of rules,image have only read permission http://container-1.it is nothing but running image 
+2.when you download a image from docker hub registry we have only read permission.once u run the docker image it act as container.with help of conainer ID you can run the application .
+[7:19 am, 29/12/2021] Vibin: docker pull imagename
+
+7:18 AMRamanji to Everyone
+docker rmi image id
+
+7:18 AMRamanji to Everyone
+docker rmi -> command used to delete container from your host server

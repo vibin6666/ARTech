@@ -1,0 +1,13 @@
+hosts: test
+  vars:
+    date: "{{ lookup('pipe', 'date +%Y%m%d-%H%M') }}"
+  tasks:
+   - name: Taking the test.war file backup into /home/stage/apps/backup
+     copy: src=/home/stage/apps/softwares/jboss-4.2.3.GA/server/test/deploy/test.war dest=/home/stage/apps/backup/test-{{ date }}.war remote_src=yes
+
+   - name: Copying the webapp file into the jboss server
+     copy: src={{item}} dest=/home/stage/apps/softwares/jboss-4.2.3.GA/server/test/deploy/test.war mode=0664
+     with_fileglob: "/var/lib/jenkins/workspace/test_testpoc/webapp/target/webapp-0.5*.war"
+
+   - name: restarting the jboss server
+     shell: chdir=/home/stage/apps/softwares/jboss-4.2.3.GA/bin/ ./test_jboss restart

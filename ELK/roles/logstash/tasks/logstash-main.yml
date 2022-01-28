@@ -1,0 +1,49 @@
+---
+#
+# Installing logstash
+#
+# Add Logstash APT repository
+- name: Adding logstash APT repository
+  apt_repository:
+   repo: deb http://packages.elastic.co/logstash/2.2/debian stable main
+   state: present
+# Installing Logstash
+- name: Update repositories cache and install Logstash
+  apt:
+   name: logstash
+   update_cache: yes
+# Creating certs directories for SSL
+- name: Creates SSL directories
+  file:
+   path: /etc/pki/tls/certs
+   state: directory
+# Creating private directories for SSL
+- name: Creates SSL directories
+  file:
+   path: /etc/pki/tls/private
+   state: directory
+# Update SSL to restrict outside access
+- name: Updating the config file to restrict outside access
+  lineinfile:
+   destfile: /etc/ssl/openssl.cnf
+   regexp: 'subjectAltName ='
+   line: 'subjectAltName = IP: {{ elk_ip }}'
+# # Configure Beats input configuration 02-beats-input.conf
+- name: Configure Beats configuration file
+  template:
+   src=logstash.conf.j2
+   dest=/etc/logstash/conf.d/logstash.conf
+   owner=root
+   group=root
+   mode=0644
+# Start Logstash service
+- name: Start Logstash service
+  systemd:
+   name: logstash
+   state: started
+   daemon_reload: yes
+# Enable Logstash service
+- name: Enable Logstash service
+  systemd:
+   name: logstash
+   enabled: yes

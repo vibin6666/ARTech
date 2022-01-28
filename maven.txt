@@ -1,0 +1,133 @@
+25-10-2021(Class Notes)
+----------
+Package:-
+Collection of .class files we can call it as package
+Example: Types-.jar, .war, .tar, .rpm, .ear, .zip 
+
+.Class files:-
+After compilation we are converting java code to .class files, it is a system understandable language.
+
+mvn clean:-
+ The purpose of mvn clean code is to delete the existing file
+
+Explain Maven repository Types:
+3 types of repository are available in Maven:
+1) Local Repository
+2).m2 repository or central repository(another name)
+3)Remote repository
+      Example: Nexus rep or Jfrog artifactory
+
+-->1) Local Repository: Local repo will use for exicuting the code localy and checking the compilation issues before we are pushing to remote repository
+-->2) .m2 repository: In .m2 repository we are storing maven dependencies in pom.xml developer mention the dependency management 
+                      ->every time when we build the code maven will read the dependency in pom.xml, 
+                      -> if the dependency available in m2 repository then maven will take the dependency from .m2 repository, 
+                      -> if dependency not available under .m2 reposiroty then maven will connect the internet, maven will download the dependency and maven will keep the dependency under .m2 repository
+                      -> Always when you exicute the mvn code maven will check defualt libraries in .m2 repository
+
+A Build Lifecycle is Made Up of Phases:-
+Each of these build lifecycles is defined by a different list of build phases, wherein a build phase represents a stage in the lifecycle.
+
+For example, the default lifecycle comprises of the following phases 
+
+->validate - validate the project is correct and all necessary information is available
+->compile - compile the source code of the project
+->test - test the compiled source code using a suitable unit testing framework. These tests should not require the code be packaged or deployed
+->package - take the compiled code and package it in its distributable format, such as a JAR.
+->verify - run any checks on results of integration tests to ensure quality criteria are met
+->install - install the package into the local repository, for use as a dependency in other projects locally
+->deploy - done in the build environment, copies the final package to the remote repository for sharing with other developers and projects.
+
+Maven 7 life cycle goals:
+  mvn validate
+  mvn compile
+  mvn test
+  mvn package
+  mvn verify
+  mvn install
+  mvn deploy
+
+
+[7:32 am, 26/11/2021] ramanji devops: mv filename destination location
+/usr/local/apache-maven
+* is nothing but select all
+
+export M2_HOME=/usr/local/apache-maven
+export M2=$M2_HOME/bin
+export PATH=$M2:$PATH
+
+export JAVA_HOME=/opt/jdk1.8.0_171
+export PATH=$PATH:JAVA_HOME/bin
+
+yum install epel-release -y
+wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins.io/redhat-stable/jenkins.repo
+rpm --import http://pkg.jenkins.io/redhat-stable/jenkins.io.key
+yum install jenkins -y
+systemctl start jenkins
+systemctl status jenkins
+
+/var/lib/jenkins/secrets/initialAdminPassword
+
+Cat /var/lib/jenkins/secrets/initialAdminPassword
+xxxxx - this password to enter jenkins login page
+[7:55 am, 26/11/2021] ramanji devops: chmod a+x /usr/local/apache-maven/bin/mvn
+[7:57 am, 26/11/2021] ramanji devops: yum update -y
+    2  ls
+    3  ls
+    4  pwd
+    5  mv jdk-8u171-linux-x64.tar.gz /opt/
+    6  ls
+    7  pwd
+    8  cd /opt/
+    9  ls
+   10  tar -xzf jdk-8u171-linux-x64.tar.gz
+   11  ls
+   12  cd jdk1.8.0_171/
+   13  ls
+   14  pwd
+   15  pwd
+   16  cd /home/centos/
+   17  ls
+   18  vi ~/.bashrc
+   19  source ~/.bashrc
+   20  ls
+   21  pwd
+   22  cd /usr/local/
+   23  ls
+   24  mkdir apache-maven
+   25  ls
+   26  cd apache-maven
+   27  ls
+   28  pwd
+   29  cd /home/centos/
+   30  ls
+   31  cd apache-maven-3.3.9/
+   32  ls
+   33  pwd
+   34  cp -r * /usr/local/apache-maven
+   35  cd /usr/local/apache-maven
+   36  ls
+   37  pwd
+   38  vi ~/.bashrc
+   39  source ~/.bashrc
+   40  mvn --version
+   41  cd /usr/local/apache-maven/
+   42  ls
+   43  chmod 777 *
+   44  ls -lart
+   45  mvn -version
+   46  ls -lart
+   47  cd bin/
+   48  ls -lart
+   49  cd ..
+   50  cd ..
+   51  ls
+   52  ls -lart
+   53  mvn --version
+   54  cd /usr/local/apache-maven/bin/mvn
+   55  cd /usr/local/apache-maven/bin/
+   56  ls -lart
+   57  exit
+   58  mvn --version
+   60  chmod a+x /usr/local/apache-maven/bin/mvn
+   61  mvn --version
+   62  history

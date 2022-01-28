@@ -1,0 +1,73 @@
+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
+
+
+mv filename destination location
+/usr/local/apache-maven
+* is nothing but select all
+
+export M2_HOME=/usr/local/apache-maven
+export M2=$M2_HOME/bin
+export PATH=$M2:$PATH
+
+export JAVA_HOME=/opt/jdk1.8.0_171
+export PATH=$PATH:JAVA_HOME/bin
+
+yum install epel-release -y
+wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins.io/redhat-stable/jenkins.repo
+rpm --import http://pkg.jenkins.io/redhat-stable/jenkins.io.key
+yum install jenkins -y
+systemctl start jenkins
+systemctl status jenkins
+
+/var/lib/jenkins/secrets/initialAdminPassword
+
+Cat /var/lib/jenkins/secrets/initialAdminPassword
+xxxxx - this password to enter jenkins login page
+
+
+***
+
+yum update -y
+    2  ls
+    3  ls
+    4  pwd
+    5  mv jdk-8u171-linux-x64.tar.gz /opt/
+    6  ls
+    7  pwd
+    8  cd /opt/
+    9  ls
+   10  tar -xzf jdk-8u171-linux-x64.tar.gz
+   11  ls
+   12  cd jdk1.8.0_171/
+   13  ls
+   14  pwd
+   15  pwd
+   16  cd /home/centos/
+   17  ls
+   18  vi ~/.bashrc
+   19  source ~/.bashrc
+   20  ls
+   21  pwd
+   22  cd /usr/local/
+   23  ls
+   24  mkdir apache-maven
+   25  ls
+   26  cd apache-maven
+   27  ls
+   28  pwd
+   29  cd /home/centos/
+   30  ls
+   31  cd apache-maven-3.3.9/
+   32  ls
+   33  pwd
+   34  cp -r * /usr/local/apache-maven
+   35  cd /usr/local/apache-maven
+   36  ls
+   37  pwd
+   38  vi ~/.bashrc
+   39  source ~/.bashrc
+   40  mvn --version
+   41  cd /usr/local/apache-maven/
+   42  ls
+   43  chmod 777 *
+   44…

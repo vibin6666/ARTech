@@ -1,0 +1,41 @@
+{
+        "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+        "contentVersion": "1.0.0.0",
+        "parameters": {
+                "storageAccountName": {
+                        "type": "String"
+                },
+                "settingName": {
+                        "type": "String"
+                },
+                "workspaceId": {
+                        "type": "String"
+                }
+        },
+        "resources": [{
+                "type": "Microsoft.Storage/storageAccounts/blobServices/providers/diagnosticsettings",
+                "apiVersion": "2017-05-01-preview",
+                "name": "[concat(parameters('storageAccountName'),'/default/Microsoft.Insights/', parameters('settingName'))]",
+                "properties": {
+                        "workspaceId": "[parameters('workspaceId')]",
+                        "logs": [],
+                        "metrics": [{
+                                        "enabled": false,
+                                        "retentionPolicy": {
+                                                "days": 0,
+                                                "enabled": false
+                                        },
+                                        "category": "Capacity"
+                                },
+                                {
+                                        "enabled": true,
+                                        "retentionPolicy": {
+                                                "days": 0,
+                                                "enabled": false
+                                        },
+                                        "category": "Transaction"
+                                }
+                        ]
+                }
+        }]
+}

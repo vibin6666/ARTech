@@ -1,0 +1,9 @@
+8. docker install
+	1. curl -fsSL https://get.docker.com/ | sh
+	2. systemctl start docker
+	3. systemctl status docker
+
+
+
+docker pull jenkins/jenkins
+docker run -p 8080:8080 -p 50000:50000 jenkins/jenkins

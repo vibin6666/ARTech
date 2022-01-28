@@ -1,0 +1,24 @@
+#surefire
+#Sun Oct 30 13:59:55 IST 2016
+testClassesDirectory=E\:\\TIRU\\Maven_practice\\myapp\\target\\test-classes
+classPathUrl.2=C\:\\Users\\Anji\\.m2\\repository\\junit\\junit\\3.8.1\\junit-3.8.1.jar
+useManifestOnlyJar=true
+classPathUrl.1=E\:\\TIRU\\Maven_practice\\myapp\\target\\classes
+reportsDirectory=E\:\\TIRU\\Maven_practice\\myapp\\target\\surefire-reports
+classPathUrl.0=E\:\\TIRU\\Maven_practice\\myapp\\target\\test-classes
+providerConfiguration=org.apache.maven.surefire.junit.JUnit3Provider
+testSuiteDefinitionTestSourceDirectory=E\:\\TIRU\\Maven_practice\\myapp\\src\\test\\java
+surefireClassPathUrl.1=C\:\\Users\\Anji\\.m2\\repository\\org\\apache\\maven\\surefire\\surefire-api\\2.12.4\\surefire-api-2.12.4.jar
+surefireClassPathUrl.0=C\:\\Users\\Anji\\.m2\\repository\\org\\apache\\maven\\surefire\\surefire-junit3\\2.12.4\\surefire-junit3-2.12.4.jar
+runOrder=filesystem
+useSystemClassLoader=true
+excludes0=**/*$*
+isTrimStackTrace=true
+tc.0=com.maaven.practice.AppTest
+enableAssertions=true
+includes2=**/*TestCase.java
+failIfNoTests=false
+includes1=**/*Test.java
+runStatisticsFile=E\:\\TIRU\\Maven_practice\\myapp\\.surefire-14B59E98CED0777F68F48F7F8C1027810731539D
+includes0=**/Test*.java
+childDelegation=false

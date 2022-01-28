@@ -1,0 +1,33 @@
+proxy:
+  secretToken: de411755cf8170c778a6eaf2cb238cdc4436d1f149d73931668d92c39c3eab3e
+hub:
+  extraVolumes:
+    - name: jhub-shared-vol
+      persistentVolumeClaim:
+        claimName: hub-pod-vol
+  extraVolumeMounts:
+    - name: jhub-shared-vol
+      mountPath: /home/jovyan/logs
+  extraConfig:
+    myExtraConfig: |
+      c.JupyterHub.extra_log_file = '/home/jovyan/logs/jupyterhub.log'
+singleuser:
+  storage:
+    dynamic:
+      storageClass: standard
+    extraVolumes:
+      - name: jhub-shared
+        persistentVolumeClaim:
+          claimName: shared-vol
+    extraVolumeMounts:
+      - name: jhub-shared
+        mountPath: /home/jovyan/ram
+auth:
+  type: dummy
+  dummy:
+    password: 'mypassword'
+  whitelist:
+    users:
+      - ramanji
+      - praveen
+      - mani

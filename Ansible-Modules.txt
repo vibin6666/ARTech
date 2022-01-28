@@ -1,0 +1,136 @@
+1. localhost -> within ansible host server if you want to install any package then under hosts section we need to give localhost.
+
+ex:
+
+hosts: localhost
+
+2. How to install package in remote server?
+
+-> under hosts section we need to give remote server Ip address or we need to provide name of the remote server.
+
+ex:
+
+hosts: 192.168.33.11
+(or)
+hosts: devserver
+
+
+tasks:
+
+to perform any action.
+
+ex: if I want to install java in centos server?
+
+tasks:
+-name: install java in centos server
+
+-> In one playbook will use multiple tasks, we don't have any limit.
+
+ex: 
+
+tasks:
+- name: install java in centos
+
+- name: install jenkins in centos
+
+- name: install ec2 instance in aws account.
+
+Ansible Modules:
+
+- shell
+- yum
+- apt-get
+- linein file
+- block in file
+- get_url
+- copy
+- with_items
+- pip
+- pip3
+- boto
+- boto3
+- conda
+
+
+*****
+
+Java Installation in localhost
+---
+- hosts: localhost
+  become: yes
+  tasks:
+
+  - name: Install Packages
+    yum: name={{ item }} update_cache=yes state=latest
+    with_items:
+      - java
+
+*******
+
+
+write a playbook install java? 
+
+- if there is no any remote server details then we need to execute the plabyook in ansible hostserver.
+for that we need to give 
+    hosts: localhost
+
+note: if you give hosts as localhost the script will execute in ansible host server.
+
+
+
+
+
+
+
+
+write a playbook install java in remote server 192.168.33.13?
+
+
+- if we have  remote server details then we need to execute the plabyook in ansible remote server.
+for that we need to give 
+    hosts: server ip address or go to 
+            ->   /etec/ansible and open hosts file give any name like 
+                 [java]
+                  192.168.33.13
+
+       - now we need to give hosts: java
+    
+Note: let say I have 5 ansible remote server that time will follow below method.
+
+go to /etc/ansible 
+vim hosts
+[java]
+192.168.33.10
+192.168.33.11
+192.168.33.12
+192.168.33.13
+192.168.33.14
+192.168.33.15
+
+***********
+
+command for check line numbers  in file            esc :set nu
+
+
+****
+
+
+AWS
+
+# Basic provisioning example
+- name: Ansible test
+hosts: localhost
+tasks:
+- name: launching AWS instance using Ansible
+ec2:
+key_name: aws_instance_Ansible
+instance_type: t2.micro
+image: ami-0dacb0c129b49f529
+region: us-east-2
+wait: yes
+group: Ansible
+count: 1
+vpc_subnet_id: default
+assign_public_ip: yes
+aws_access_key: ***********xxxxxxxx
+Aws_secret_key: ***********xxxxxxxx

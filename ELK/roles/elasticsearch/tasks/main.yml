@@ -1,0 +1,29 @@
+---
+#Installing Elasticsearch
+
+# Add the Elasticsearch APT-repository
+- name: copy the repo file
+  copy:
+   src: elastic_stack.repo
+   dest: /etc/yum.repos.d
+# Install Elasticsearch
+- name: Update repositories cache and install Elasticsearch
+  yum:
+   name: elasticsearch
+   update_cache: yes
+# Update Elasticsearch config file to only allow localhost connections
+- name: Updating the config file to restrict outside access
+  lineinfile:
+   destfile: /etc/elasticsearch/elasticsearch.yml
+   regexp: 'network.host:'
+   line: 'network.host: localhost'
+- name: Updating the config file to restrict outside access1
+  lineinfile:
+   destfile: /etc/elasticsearch/elasticsearch.yml
+   regexp: 'path.data:'
+   line: 'path.data: /elk/elasticsearch/data'
+# Restart Elasticsearch
+- name: Restarting Elasticsearch
+  service:
+   name: elasticsearch
+   state: restarted

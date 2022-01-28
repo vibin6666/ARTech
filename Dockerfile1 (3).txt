@@ -1,0 +1,8 @@
+#!/bin/bash
+Image_ID=artech/ecs
+current_date=$(date '+%Y%m%d%H%M%S')
+tagName="fqa-${current_date}" 
+echo $tagName
+sudo docker tag $Image_Name artech-qa-repo.docker.com/$Image_ID:$tagName
+sudo docker push artech-qa-repo.docker.com/$Image_ID:$tagName
+sudo docker rmi -f artech-dev-repo.docker.com/$Image_ID:latest
